@@ -4,13 +4,14 @@ require 'redis'
 require 'date'
 client = Mysql2::Client.new(:host => "localhost", :username => "root")
 redis = Redis.new
+max_word_frequency_sort = 100000    #基本词频表，如果查询不到，则为最不常见单词，应比最大ID值还大
 unless redis.exists("notebook:one_hundred_thousand_word_frequency_lists")
 	client.query("SELECT * FROM lab.one_hundred_thousand_word_frequency_lists").each do |item|
 		redis.hset("notebook:one_hundred_thousand_word_frequency_lists",item["word"],item["id"])
 	end
 end
-client.query("SELECT * FROM lab.reader_user_notebooks limit 1").each do |item|
-	redis.del("notebook:#{item["user_id"]}:#{item["user_name"]}") if redis.exists("notebook:#{item["user_id"]}:#{item["user_name"]}")
+redis.del("notebook:reader_user_notebooks:all_users") if redis.exists("notebook:reader_user_notebooks:all_users")
+client.query("SELECT * FROM lab.reader_user_notebooks").each do |item|
 	result_book_id = client.query("SELECT book FROM lab.reader_users where id=#{item["user_id"]} ")
 	book_id = 1
 	result_book_id.each do |xx|
@@ -39,7 +40,7 @@ client.query("SELECT * FROM lab.reader_user_notebooks limit 1").each do |item|
 	array2 = notebook_hash.keys   #按词频表词频排序
 	array3 = notebook_hash.keys	  #按未来可能遇到的词排序
 	array4 = notebook_hash.keys   #最终排序
-	array1.sort! do |a,b|
+	array1.sort! do |a,b|		  #按时间排序
 		if notebook_hash[a]>notebook_hash[b]
 			-1
 		elsif notebook_hash[a]==notebook_hash[b]
@@ -48,9 +49,11 @@ client.query("SELECT * FROM lab.reader_user_notebooks limit 1").each do |item|
 			1
 		end
 	end
-	array2.sort! do |a,b|
-		sort_a = redis.hget("notebook:one_hundred_thousand_word_frequency_lists",a).to_i
-		sort_b = redis.hget("notebook:one_hundred_thousand_word_frequency_lists",b).to_i
+	array2.sort! do |a,b|			#按词频表词频排序
+		sort_a = redis.hget("notebook:one_hundred_thousand_word_frequency_lists",a)
+		sort_b = redis.hget("notebook:one_hundred_thousand_word_frequency_lists",b)
+		sort_a = sort_a.nil? ? max_word_frequency_sort : sort_a.to_i
+		sort_b = sort_b.nil? ? max_word_frequency_sort : sort_b.to_i
 		if sort_a < sort_b
 			-1
 		elsif sort_a == sort_b
@@ -59,7 +62,7 @@ client.query("SELECT * FROM lab.reader_user_notebooks limit 1").each do |item|
 			1
 		end	
 	end
-	array3.sort! do |a,b|
+	array3.sort! do |a,b|			#按未来可能遇到的词排序
 		frequency_a = redis.hget("notebook:#{book_id}:#{book_name}:word_frequency_statistics",a).to_i
 		frequency_b = redis.hget("notebook:#{book_id}:#{book_name}:word_frequency_statistics",b).to_i
 		if frequency_a>frequency_b
@@ -83,11 +86,15 @@ client.query("SELECT * FROM lab.reader_user_notebooks limit 1").each do |item|
 			1
 		end		
 	end
-	array4.each do |word|
-		redis.rpush("notebook:#{item["user_id"]}:#{item["user_name"]}",word)
-	end
-	puts "array1 = #{array1}"
-	puts "array2 = #{array2}"
-	puts "array3 = #{array3}"
-	puts "array4 = #{array4}"
+	# puts "array1 = #{array1}"
+	# puts "array2 = #{array2}"
+	# puts "array3 = #{array3}"
+	# puts "array4 = #{array4}"
+	redis.hset("notebook:reader_user_notebooks:all_users",item["user_id"],array4.join("|"))
 end
+redis.del("notebook:one_hundred_thousand_word_frequency_lists")
+client.query("SELECT * FROM lab.reader_books").each do |item|
+	redis.del("notebook:#{item["id"]}:#{item["book_name"]}:word_frequency_statistics")
+end
+client.close
+redis.quit

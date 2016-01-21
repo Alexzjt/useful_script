@@ -42,9 +42,11 @@ begin
     array3 = notebook_hash.keys #按未来可能遇到的词排序
     array4 = notebook_hash.keys #最终排序
     array1.sort! do |a, b| #按时间排序
-      if notebook_hash[a]>notebook_hash[b]
+      time_a = DateTime.parse(notebook_hash[a])
+      time_b = DateTime.parse(notebook_hash[b])
+      if time_a>time_b
         -1
-      elsif notebook_hash[a]==notebook_hash[b]
+      elsif time_a==time_b
         0
       else
         1

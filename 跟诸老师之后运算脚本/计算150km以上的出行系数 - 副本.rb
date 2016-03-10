@@ -1,7 +1,8 @@
 require 'date'
 require 'find'
-upbound = 250
-downbound = 200
+upbound = 800
+downbound = 250
+date = 20141201
 odfile = File.new("D:\\重庆数据\\梯形图格式转化.csv")
 #datefile = File.new("D:\\重庆数据\\201412收费站出站数据\\20141201.csv")
 outfile = File.new("D:\\重庆数据\\2014年12月按天分析出行系数的结果#{downbound}_#{upbound}.csv","w")
@@ -14,7 +15,6 @@ odfile.each do |line|
 	array = line.split(",")
 	odhash[array[0]+"_"+array[1]]=array[2].to_f
 end
-date = 20141201
 file_array.each do |file|
 	next if File.directory? (file)
 	puts file

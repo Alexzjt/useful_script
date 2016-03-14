@@ -1,13 +1,13 @@
 require 'date'
 require 'find'
-upbound = 800
+upbound = 300
 downbound = 250
-date = 20151101
+date = 20141201
 odfile = File.new("D:\\重庆数据\\梯形图格式转化.csv")
 #datefile = File.new("D:\\重庆数据\\201412收费站出站数据\\20141201.csv")
-outfile = File.new("E:\\重庆2015年11月刷卡数据\\实验结果\\2015年11月按天分析出行系数的结果#{downbound}_#{upbound}.csv","w")
+outfile = File.new("D:\\重庆数据\\实验结果\\2015年11月按天分析出行系数的结果#{downbound}_#{upbound}.csv","w")
 file_array = []
-Find.find("E:\\重庆2015年11月刷卡数据\\11月高速出口刷卡数据分割") do |filename|
+Find.find("D:\\重庆数据\\201412收费站出站数据") do |filename|
 	file_array.push filename
 end
 odhash = Hash.new(0)

@@ -1,11 +1,15 @@
 require 'date'
 require 'find'
-upbound = 50
-downbound = 2
+upbound_array = [5,10,15,20,25,30,35,40,45,50]
+downbound_array = [2,5,10,15,20,25,30,35,40,45]
+bound_counter = 0
+while bound_counter<upbound_array.length
+	upbound=upbound_array[bound_counter]
+	downbound=downbound_array[bound_counter]
 date = 20151101
 odfile = File.new("D:\\重庆数据\\梯形图格式转化.csv")
 #datefile = File.new("D:\\重庆数据\\201412收费站出站数据\\20141201.csv")
-outfile = File.new("E:\\重庆2015年11月刷卡数据\\实验结果\\2015年11月按天分析出行系数的结果#{downbound}_#{upbound}_ETC_MTC.csv","w")
+outfile = File.new("E:\\重庆2015年11月刷卡数据\\实验结果\\ETCMTC\\2015年11月按天分析出行系数的结果#{downbound}_#{upbound}_ETC_MTC.csv","w")
 file_array = []
 Find.find("E:\\重庆2015年11月刷卡数据\\11月高速出口刷卡数据分割") do |filename|
 	file_array.push filename
@@ -17,7 +21,7 @@ odfile.each do |line|
 end
 file_array.each do |file|
 	next if File.directory? (file)
-	puts file
+	puts file+" #{upbound} #{downbound}"
 	sum_cxxs_ETC = 0
 	sum_cxxs_MTC = 0
 	counter_ETC = 0
@@ -48,3 +52,5 @@ file_array.each do |file|
 end
 odfile.close
 outfile.close
+bound_counter+=1
+end

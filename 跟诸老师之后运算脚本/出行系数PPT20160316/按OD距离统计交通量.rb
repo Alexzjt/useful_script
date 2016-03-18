@@ -4,8 +4,6 @@ shangjie = 100
 xiajie = 0
 changdu = 5
 date = Date.parse("20151001")
-etc_cxxs_sum = []
-mtc_cxxs_sum = []
 etc_count = []
 mtc_count = []
 odfile = File.new("D:\\zjt\\重庆2015年11月刷卡数据\\梯形图格式转化.csv")
@@ -39,8 +37,6 @@ file_array.each do |file|
 	puts file
 	jishuqi=0
 	while jishuqi<shangjie/changdu
-		etc_cxxs_sum[jishuqi] = 0.0
-		mtc_cxxs_sum[jishuqi] = 0.0
 		etc_count[jishuqi] = 0
 		mtc_count[jishuqi] = 0
 		jishuqi+=1
@@ -54,12 +50,9 @@ file_array.each do |file|
 		if array[28].to_i==0 && array[11].to_i<=1 && length>xiajie && length<shangjie && line_datetime.hour>=5 && line_datetime.hour<=20
 			between = (line_datetime-DateTime.parse(array[10]))*86400  #1440==24*60
 			next if between>86400 || between<=0   #如果在高速内停留时间超过一天，则判定为数据非法
-			cxxs = between/length 
-			if array[49].gsub!(" ","").empty?
-				mtc_cxxs_sum[bianhao] += cxxs
+			if array[49].strip.empty?
 				mtc_count[bianhao] += 1
 			else
-				etc_cxxs_sum[bianhao] += cxxs
 				etc_count[bianhao] += 1
 			end
 		end

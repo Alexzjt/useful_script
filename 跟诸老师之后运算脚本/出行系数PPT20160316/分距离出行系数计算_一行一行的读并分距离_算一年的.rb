@@ -11,7 +11,7 @@ outfile = File.new("D:\\zjt\\实验结果\\20160317\\#{date.year}出行系数_#{
 output_str = ""
 jishuqi=0
 temp = xiajie
-while jishuqi<shangjie/changdu
+while jishuqi<(shangjie-xiajie)/changdu
 	output_str+=",#{temp}_#{temp+changdu}"
 	jishuqi+=1
 	temp += changdu
@@ -29,7 +29,7 @@ end
 file_array.each do |file|   
 	puts file
 	jishuqi=0
-	while jishuqi<shangjie/changdu
+	while jishuqi<(shangjie-xiajie)/changdu
 		cxxs_sum[jishuqi] = 0.0
 		count[jishuqi] = 0
 		jishuqi+=1
@@ -38,7 +38,7 @@ file_array.each do |file|
 	datefile.each do |line|
 		array = line.split(",")
 		length = odhash[array[0]+"_"+array[9]]
-		bianhao = length/changdu
+		bianhao = (length-xiajie)/changdu
 		line_datetime = DateTime.parse(array[2])
 		if array[28].to_i==0 && array[11].to_i<=1 && length>xiajie && length<shangjie && line_datetime.hour>=5 && line_datetime.hour<=20
 			between = (line_datetime-DateTime.parse(array[10]))*86400  #1440==24*60
@@ -50,7 +50,7 @@ file_array.each do |file|
 	end
 	jishuqi=0
 	output_str = "#{date.to_s}"
-	while jishuqi<shangjie/changdu
+	while jishuqi<(shangjie-xiajie)/changdu
 		output_str+=",#{cxxs_sum[jishuqi]/count[jishuqi]}"
 		jishuqi+=1
 	end

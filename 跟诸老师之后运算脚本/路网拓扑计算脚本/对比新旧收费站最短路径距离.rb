@@ -1,22 +1,20 @@
-newSP=File.new("E:\\百度云同步盘\\诸老师这边的事\\路网拓扑划分201604\\收费站最短距离.csv")
+newSP=File.new("E:\\百度云同步盘\\诸老师这边的事\\路网拓扑划分201604\\收费站最短距离20160504143250.csv")
 oldSP=File.new("E:\\百度云同步盘\\诸老师这边的事\\路网拓扑划分201604\\old收费站最短距离.csv")
 outputSP=File.new("E:\\百度云同步盘\\诸老师这边的事\\路网拓扑划分201604\\收费站最短距离对比.csv","w")
-hash=Hash.new()
+od_qingfen=Hash.new()
+od_old_sp=Hash.new()
+od_new_sp=Hash.new()
 oldSP.each do |line|
 	array=line.split(",")
-	hash["#{array[0]},#{array[1]}"]="#{array[2]},#{array[3]}"
+	od_qingfen["#{array[0]},#{array[1]}"]=array[2].chomp
+	od_old_sp["#{array[0]},#{array[1]}"]=array[3].chomp
 end
 newSP.each do |line|
 	array=line.split(",")
-	if(hash.include?("#{array[0]},#{array[1]}"))
-		oldlength=hash["#{array[0]},#{array[1]}"]
-		hash["#{array[0]},#{array[1]}"]="#{oldlength},#{array[2]}"
-	else
-		hash["#{array[0]},#{array[1]}"]=",,#{array[2]}"
-	end
+	od_new_sp["#{array[0]},#{array[1]}"]=array[2].chomp
 end
-hash.each do |key,value|
-	outputSP.puts "#{key},#{value}"
+od_new_sp.each do |key,value|
+	outputSP.puts "#{key},#{od_qingfen[key]},#{od_old_sp[key]},#{od_new_sp[key]},#{od_new_sp[key].to_f/od_qingfen[key].to_f},#{od_new_sp[key].to_f/od_old_sp[key].to_f}"
 end
 newSP.close
 oldSP.close

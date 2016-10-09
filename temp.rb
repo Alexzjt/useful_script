@@ -11,10 +11,21 @@ begin
   number=1
   buffer=""
   infile.each do |line|
-  	sql="insert into shandong.roadlinks values #{line};"
-  	puts sql
-  	client.query(sql)
+    if(number%1000==0)
+      buffer+="(#{line})"
+      sql="insert into shandong.roadlinks values #{buffer};"
+      puts sql
+      client.query(sql)
+      buffer=""
+      puts number
+    else
+      buffer+="(#{line}),"
+    end
+    #puts sql
+    number+=1
   end
+  sql="insert into shandong.roadlinks values #{buffer.chop};"
+  client.query(sql)
   infile.close
   end
 rescue
@@ -25,3 +36,4 @@ ensure
   client.close
   
 end
+
